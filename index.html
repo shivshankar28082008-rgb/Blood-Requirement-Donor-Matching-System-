@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Blood Requirement & Donor Matching System</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f8fafc;color:#172033}.app{max-width:1100px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;padding:28px;border-radius:22px;margin-bottom:18px}.hero h1{margin:0 0 8px}.hero p{margin:0;color:#fee2e2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.06)}label{display:block;font-weight:700;margin:10px 0 6px}input,select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}.btn{margin-top:15px;border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;background:#b91c1c;color:white}.result{margin-top:15px}.donor{border:1px solid #fecaca;background:#fff7f7;border-radius:12px;padding:13px;margin-bottom:10px}.tag{display:inline-block;background:#fee2e2;color:#991b1b;border-radius:999px;padding:4px 8px;font-size:12px;margin-top:6px}.ok{padding:12px;border-radius:10px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}.warn{padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.stat{padding:14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;text-align:center}.stat b{display:block;font-size:1.4rem}@media(max-width:800px){.grid{grid-template-columns:1fr}}@media(max-width:520px){.app{padding:12px}.stats{grid-template-columns:1fr}}
+</style></head>
+<body><div class="app">
+<section class="hero"><h1>🩸 Blood Requirement & Donor Matching System</h1><p>Find matching sample donors by blood group and location for a project demonstration.</p></section>
+<div class="grid">
+<section class="card"><h2>🔎 Blood Requirement</h2>
+<label>Patient / Requester Name</label><input id="requester" placeholder="Enter name">
+<label>Blood Group Required</label><select id="blood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+<label>Location</label><input id="location" placeholder="e.g. Phagwara">
+<label>Units Required</label><input id="units" type="number" min="1" value="1">
+<button class="btn" id="find">Find Matching Donors</button>
+<div id="result" class="result"></div>
+</section>
+<section class="card"><h2>👥 Donor Records</h2>
+<div class="stats"><div class="stat"><b id="total">0</b>Total Donors</div><div class="stat"><b id="groups">0</b>Blood Groups</div><div class="stat"><b id="locations">0</b>Locations</div></div>
+<div id="donors" class="result"></div>
+</section>
+</div>
+</div>
+<script>
+const donors=[
+{id:1,name:'Aman Kumar',blood:'O+',location:'Phagwara',phone:'9876500011',units:2},
+{id:2,name:'Priya Sharma',blood:'A+',location:'Phagwara',phone:'9876500012',units:1},
+{id:3,name:'Rohit Verma',blood:'B+',location:'Jalandhar',phone:'9876500013',units:2},
+{id:4,name:'Neha Singh',blood:'AB+',location:'Phagwara',phone:'9876500014',units:1},
+{id:5,name:'Arjun Das',blood:'O-',location:'Ludhiana',phone:'9876500015',units:3},
+{id:6,name:'Simran Kaur',blood:'B-',location:'Jalandhar',phone:'9876500016',units:1},
+{id:7,name:'Vikas Yadav',blood:'A-',location:'Phagwara',phone:'9876500017',units:2},
+{id:8,name:'Kiran Devi',blood:'AB-',location:'Ludhiana',phone:'9876500018',units:1}
+];
+const donorEl=document.getElementById('donors');
+function renderDonors(){
+ donorEl.innerHTML=donors.map(d=>'<div class="donor"><strong>'+d.name+'</strong><br>'+d.blood+' · '+d.location+'<br>Available Units: '+d.units+'<br><span class="tag">Sample Record</span></div>').join('');
+ document.getElementById('total').textContent=donors.length;
+ document.getElementById('groups').textContent=new Set(donors.map(d=>d.blood)).size;
+ document.getElementById('locations').textContent=new Set(donors.map(d=>d.location.toLowerCase())).size;
+}
+document.getElementById('find').onclick=()=>{
+ const blood=document.getElementById('blood').value,loc=document.getElementById('location').value.trim().toLowerCase(),units=Math.max(1,Number(document.getElementById('units').value)||1);
+ const matches=donors.filter(d=>d.blood===blood&&d.units>=units&&(!loc||d.location.toLowerCase().includes(loc)));
+ const name=document.getElementById('requester').value.trim()||'Requester';
+ const box=document.getElementById('result');
+ if(matches.length){
+   box.innerHTML='<div class="ok"><strong>Matching donors found for '+name+'.</strong><br>'+matches.length+' sample donor(s) match the selected blood group'+(loc?' and location.':'.')+'</div>'+matches.map(d=>'<div class="donor"><strong>'+d.name+'</strong><br>Blood Group: '+d.blood+'<br>Location: '+d.location+'<br>Available Units: '+d.units+'<br>Contact: '+d.phone+'</div>').join('');
+ }else box.innerHTML='<div class="warn"><strong>No matching sample donor found.</strong><br>Try another location or required blood group.</div>';
+};
+renderDonors();
+</script></body></html>
